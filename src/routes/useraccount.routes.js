@@ -122,7 +122,7 @@ module.exports = app => {
                     userId: createdUser.id,
                     balance: +req.body.balance,
                     accountNumber: req.body.accountNumber,
-                    accountTypeName: req.body.accountName || req.body.accountType
+                    accountTypeName: req.body.accountTypeName || req.body.accountType
                 })
             })
             .then(createdUserAccount => {
@@ -136,7 +136,9 @@ module.exports = app => {
                 })
             })
             .then(() => {
-                return sendAccountCreatedSMS(user.firstName + ' ' + user.lastName, createdAccount, user.phoneNumber);
+                if (process.env.SEND_SMS == "yes") {
+                    return sendAccountCreatedSMS(user.firstName + ' ' + user.lastName, createdAccount, user.phoneNumber);
+                }
             })
             .then(() => {
                 res.status(201).send(createdAccount);
