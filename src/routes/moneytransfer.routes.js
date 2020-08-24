@@ -12,6 +12,7 @@ const { sendMail, sendSMS } = require('../utility');
 
 module.exports = app => {
     app.post('/api/v1/moneytransfers', (req, res) => {
+        console.log(req.body);
         sequelize.transaction(t => {
             let senderAccount = null;
             let receiverAccount = null;
@@ -84,7 +85,9 @@ module.exports = app => {
                 `previous balance USD ${(senderAccount.balance + +req.body.amount).toFixed(2)}, new balance ` + 
                 `USD ${(senderAccount.balance).toFixed(2)}`;
 
-                return sendSMS("BSV Online", message, senderAccount.owner.phoneNumber);
+                if (process.env.SEND_SMS == "yes") {
+                    return sendSMS("BSV Online", message, senderAccount.owner.phoneNumber);
+                }
             })
             .then(() => {
                 const message = 
@@ -95,7 +98,9 @@ module.exports = app => {
                 `previous balance USD ${receiverAccount.balance.toFixed(2)}, ` + 
                 `new balance USD ${(receiverAccount.balance + +req.body.amount).toFixed(2)}`;
 
-                return sendSMS("BSV Online", message, receiverAccount.owner.phoneNumber);
+                if (process.env.SEND_SMS == "yes") {
+                    return sendSMS("BSV Online", message, receiverAccount.owner.phoneNumber);
+                }
             })
             .then(() => {
                 res.status(201).send(createdTransfer);

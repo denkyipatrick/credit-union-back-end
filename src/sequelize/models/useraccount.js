@@ -34,6 +34,21 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'accountTypeName',
       as: 'account'
     });
+
+    UserAccount.hasMany(models.Transaction, {
+      foreignKey: 'userAccountId',
+      as: 'transactions'
+    });
+
+    UserAccount.hasMany(models.MoneyTransfer, {
+      foreignKey: 'senderAccountId',
+      as: 'transfers'
+    });
+    
+    UserAccount.hasMany(models.MoneyTransfer, {
+      foreignKey: 'receiverAccountId',
+      as: 'receivedTransfers'
+    })
   };
   return UserAccount;
 };

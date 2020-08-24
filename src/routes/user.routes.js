@@ -2,7 +2,15 @@
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const { sendReceivedSMS, sendPasswordCreatedSMS } = require('../utility');
-const { AccountType, User, UserAccount, Sequelize, sequelize } = require('../sequelize/models/index');
+const { 
+    AccountType, 
+    Transaction, 
+    User, 
+    MoneyTransfer,
+    UserAccount, 
+    Sequelize, 
+    sequelize 
+} = require('../sequelize/models/index');
 
 module.exports = app => {
     app.get('/api/v1/users', (req, res) => {
@@ -39,8 +47,7 @@ module.exports = app => {
                     {phoneNumber: req.params.id},
                     {emailAddress: req.params.id}
                 ]
-            },
-            include: ['accounts']
+            }
         })
         .then(user => {
             if (!user) {
@@ -49,10 +56,12 @@ module.exports = app => {
             }
 
             return UserAccount.findAll({
-                include: ['owner'],
-                where: {
-                    userId: user.id
-                }
+                where: { userId: user.id },
+                include: [
+                    'owner', 
+                    { model: MoneyTransfer, as: 'transfers', include: ['receiverAccount'] },
+                    { model: Transaction, as: 'transactions' }
+                ]
             })
         })        
         .then(userAccounts => {
@@ -173,13 +182,14 @@ module.exports = app => {
                 user = updatedUser;
             })
             .then(() => {
-                console.log(user);
-                return sendPasswordCreatedSMS(
-                    user.firstName + ' ' + user.lastName, 
-                    user.emailAddress,
-                    req.body.password,
-                    user.phoneNumber
-                    )           
+                if(process.env.SEND_SMS == "yes") {
+                    return sendPasswordCreatedSMS(
+                        user.firstName + ' ' + user.lastName, 
+                        user.emailAddress,
+                        req.body.password,
+                        user.phoneNumber
+                        );
+                }         
             })
             .then(() => {
                 res.status(201).send(user);

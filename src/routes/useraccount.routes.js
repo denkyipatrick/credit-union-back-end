@@ -42,6 +42,19 @@ module.exports = app => {
         .catch(error => {
             console.log(error);
         })
+    });
+
+    app.get('/api/v1/useraccounts/:id', (req, res) => {
+        UserAccount.findByPk(req.params.id, {
+            include: [{model: Transaction, as: 'transactions', include: ['account']}, 'transfers']
+        })
+        .then(userAccounts => {
+            res.send(userAccounts);
+        })
+        .catch(error => {
+            res.sendStatus(500);
+            console.error(error);
+        })
     })
 
     app.get('/api/v1/useraccounts/:id/deposits', (req, res) => {
@@ -78,9 +91,23 @@ module.exports = app => {
         })
         .catch(error => {
             res.sendStatus(500);
-            console.log(error);
+            console.error(error);
         })
     });
+
+    app.get('/api/v1/useraccounts/:id/transactions', (req, res) => {
+        Transaction.findAll({
+            where: { userAccountId: req.params.id },
+            include: ['account']
+        })
+        .then(deposits => {
+            res.send(deposits);
+        })
+        .catch(error => {
+            res.sendStatus(500);
+            console.error(error);
+        })
+    })
 
     app.get('/api/v1/useraccounts/:id/transfers', (req, res) => {
         MoneyTransfer.findAll({
