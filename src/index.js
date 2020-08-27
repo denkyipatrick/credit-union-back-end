@@ -15,6 +15,7 @@ require('./routes/user.routes')(application);
 require('./routes/useraccount.routes')(application);
 require('./routes/accounttype.routes')(application);
 require('./routes/transaction.routes')(application);
+require('./routes/admincontact.routes')(application);
 require('./routes/moneytransfer.routes')(application);
 
 if (process.env.USE_HTTPS.indexOf("yes") > -1) {    

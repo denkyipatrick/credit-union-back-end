@@ -46,7 +46,11 @@ module.exports = app => {
 
     app.get('/api/v1/useraccounts/:id', (req, res) => {
         UserAccount.findByPk(req.params.id, {
-            include: [{model: Transaction, as: 'transactions', include: ['account']}, 'transfers']
+            include: [{model: Transaction, as: 'transactions', include: ['account']},
+            { model: MoneyTransfer, as: 'transfers', include: [
+                { model: UserAccount, as: 'receiverAccount', include: ['owner'] }
+            ] }
+        ]
         })
         .then(userAccounts => {
             res.send(userAccounts);
