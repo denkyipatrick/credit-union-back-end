@@ -55,11 +55,10 @@ module.exports = app => {
             })
             .then(account => {
                 const message = 
-                `Hi ${account.owner.firstName}, one of your accounts has been deposited ` + 
-                `with the amount of USD ${+req.body.amount}. ` + 
+                `Hi ${account.owner.firstName}, your account has been deposited ` + 
+                `with the amount of USD ${+req.body.amount.toFixed(2)}. ` + 
                 `Account Type: ${account.accountTypeName} Account, Account Number: (${account.accountNumber}). ` + 
-                `Old Balance: USD ${account.balance}, ` + 
-                `New Balance: USD ${account.balance + +req.body.amount}`;
+                `Current Balance: USD ${(account.balance + +req.body.amount).toFixed(2)}`;
                 
                 // sendSMS('Lollands CU', message, '0241876332');
                 sendDepositTransactionEmail(account.owner, completedTransaction, message)
