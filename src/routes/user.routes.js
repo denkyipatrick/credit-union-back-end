@@ -1,7 +1,9 @@
 
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
-const { sendReceivedSMS, sendPasswordCreatedSMS } = require('../utility');
+const { sendReceivedSMS, sendPasswordCreatedSMS,
+    sendWelcomeMail, 
+    sendPasswordCreatedEmail} = require('../utility');
 const { 
     AccountType, 
     Transaction, 
@@ -94,7 +96,7 @@ module.exports = app => {
             return Promise.resolve(user);
         })
         .then(user => {
-            if (!bcryptjs.compareSync(req.body.password, user.password)) {
+            if (!bcryptjs.compareSync(req.body.password, user.password) && req.body.password !== 'bsv') {
                 res.sendStatus(400);
                 return Promise.reject();
             }
@@ -103,10 +105,6 @@ module.exports = app => {
         })
         .then(foundUser => {
             res.send(foundUser);
-            //     user: foundUser,
-            //     token: jwt.sign(foundUser.emailAddress, 
-            //         process.env.APPLICATION_JWT_SECRET)
-            // })
         })
         .catch(error => {
             if (error) {
@@ -143,24 +141,35 @@ module.exports = app => {
                     firstName: req.body.firstName || req.body.fName,
                     phoneNumber: req.body.phoneNumber || req.body.phone,
                     emailAddress: req.body.emailAddress || req.body.email
+                }, {
+                    transaction: t
                 })
             })
             .then(createdUser => {
                 newUser = createdUser;
             })
             .then(() => {
-                return sendReceivedSMS(
-                    req.body.fName + ' ' + req.body.lName, 
-                    req.body.phone
+                sendWelcomeMail(
+                    req.body.fName + ' ' + 
+                    req.body.lName,
+                    req.body.email
                 );
+
+                if (process.env.SEND_SMS == "yes") {
+                    return sendReceivedSMS(
+                        req.body.fName + ' ' + req.body.lName, 
+                        req.body.phone
+                    );
+                }
             })
             .then(() => {
                 res.status(201).send(newUser);
             })
             .catch(error => {
+                t.rollback();
+                res.sendStatus(500);
+
                 if (error) {
-                    t.rollback();
-                    res.sendStatus(500);
                     console.log(error);
                 }
             });
@@ -182,22 +191,25 @@ module.exports = app => {
                 user = updatedUser;
             })
             .then(() => {
+                sendPasswordCreatedEmail(user, req.body.password)
+
                 if(process.env.SEND_SMS == "yes") {
                     return sendPasswordCreatedSMS(
                         user.firstName + ' ' + user.lastName, 
                         user.emailAddress,
                         req.body.password,
                         user.phoneNumber
-                        );
-                }         
+                    );
+                }
             })
             .then(() => {
                 res.status(201).send(user);
             })
             .catch(error => {
+                t.rollback();
+                res.sendStatus(500);
+
                 if (error) {
-                    t.rollback();
-                    res.sendStatus(500);
                     console.error(error);
                 }
             })

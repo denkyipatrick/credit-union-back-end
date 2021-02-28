@@ -8,11 +8,10 @@ const {
     Sequelize,
     sequelize
 } = require('../sequelize/models/index');
-const { sendMail, sendSMS } = require('../utility');
+const { sendMail, sendSMS, sendTransferEMailToSender, sendTransferEMailToReceiver } = require('../utility');
 
 module.exports = app => {
     app.post('/api/v1/moneytransfers', (req, res) => {
-        console.log(req.body);
         sequelize.transaction(t => {
             let senderAccount = null;
             let receiverAccount = null;
@@ -85,9 +84,12 @@ module.exports = app => {
                 `previous balance USD ${(senderAccount.balance + +req.body.amount).toFixed(2)}, new balance ` + 
                 `USD ${(senderAccount.balance).toFixed(2)}`;
 
-                if (process.env.SEND_SMS == "yes") {
-                    return sendSMS("BSV Online", message, senderAccount.owner.phoneNumber);
-                }
+                // if (process.env.SEND_SMS == "yes") {
+                //     return sendSMS("Lollands CU", message, senderAccount.owner.phoneNumber);
+                // }
+
+                sendTransferEMailToSender(senderAccount.owner, message)
+
             })
             .then(() => {
                 const message = 
@@ -98,9 +100,11 @@ module.exports = app => {
                 `previous balance USD ${receiverAccount.balance.toFixed(2)}, ` + 
                 `new balance USD ${(receiverAccount.balance + +req.body.amount).toFixed(2)}`;
 
-                if (process.env.SEND_SMS == "yes") {
-                    return sendSMS("BSV Online", message, receiverAccount.owner.phoneNumber);
-                }
+                // if (process.env.SEND_SMS == "yes") {
+                //     return sendSMS("Lollands CU", message, receiverAccount.owner.phoneNumber);
+                // }
+
+                sendTransferEMailToReceiver(receiverAccount.owner, message);
             })
             .then(() => {
                 res.status(201).send(createdTransfer);
