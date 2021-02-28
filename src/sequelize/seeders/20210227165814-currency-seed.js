@@ -12,11 +12,21 @@ module.exports = {
         isBetaMember: false
       }], {});
     */
-   return queryInterface.bulkInsert('AccountTypes', [
-     {  name: 'Savings', createdAt: new Date(), updatedAt: new Date() },
-     { name: 'Fixed', createdAt: new Date(), updatedAt: new Date() },
-     { name: 'Business Checking', createdAt: new Date(), updatedAt: new Date() },
-     { name: 'Personal Checking', createdAt: new Date(), updatedAt: new Date() }
+   return queryInterface.bulkInsert('Currencies', [
+    { id: 'euro_currency', 
+      currency: 'Euro', 
+      name: 'USD_EUR', 
+      rate: 0.83, 
+      createdAt: new Date().getTime(), 
+      updatedAt: new Date().getTime()
+    },
+    { id: 'usd_currency', 
+      currency: 'Dollar', 
+      name: 'EUR_USD', 
+      rate: 1, 
+      createdAt: new Date().getTime(), 
+      updatedAt: new Date().getTime()
+    }
    ]);
   },
 

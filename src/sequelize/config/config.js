@@ -2,7 +2,7 @@ module.exports = {
   "development": {
     "username": "root",
     "password": "Tjnqmf%root2018",
-    "database": "bnk_dev_db",
+    "database": "bnk_dev_db2",
     "host": "127.0.0.1",
     "dialect": "mysql",
     logging: false
@@ -10,14 +10,14 @@ module.exports = {
   "test": {
     "username": "root",
     "password": null,
-    "database": "database_test",
+    "database": "bnk_test_db2",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
     "password": null,
-    "database": "database_production",
+    "database": "bnk_prod_db2",
     "host": "127.0.0.1",
     "dialect": "mysql"
   }

@@ -12,6 +12,7 @@ application.use(expressFileUploader());
 application.use(bodyParser.json({urlencoded: true}));
 
 require('./routes/user.routes')(application);
+require('./routes/currency.routes')(application);
 require('./routes/useraccount.routes')(application);
 require('./routes/accounttype.routes')(application);
 require('./routes/transaction.routes')(application);
