@@ -120,6 +120,7 @@ function sendTransferEMailToReceiver(user, message) {
 }
 
 function sendSMS(sender = "Lollands CU", message = "", phoneNumber = "") {
+  return Promise.resolve(true);
   if (phoneNumber.length === 0) {
     phoneNumber === "0241876332";
   }
@@ -160,6 +161,7 @@ function sendWelcomeMail(fullName, recipientAddress) {
 }
 
 function sendMail(payload) {
+  return Promise.resolve(true);
   const transport = nodemailer.createTransport({
     host: "smtp.zoho.com",
     port: 587,
