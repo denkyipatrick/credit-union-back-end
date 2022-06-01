@@ -50,7 +50,12 @@ module.exports = (app) => {
     try {
       const account = await UserAccount.findByPk(req.params.id, {
         include: [
-          { model: Transaction, as: "transactions", include: ["account"] },
+          {
+            model: Transaction,
+            as: "transactions",
+            include: ["account"],
+            order: [["createdAt", "DESC"]],
+          },
           {
             model: MoneyTransfer,
             as: "transfers",
@@ -143,6 +148,7 @@ module.exports = (app) => {
     Transaction.findAll({
       where: { userAccountId: req.params.id },
       include: ["account"],
+      order: [["createdAt", "DESC"]],
     })
       .then((deposits) => {
         res.send(deposits);
